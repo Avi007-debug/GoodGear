@@ -28,7 +28,7 @@ function WorkPulse() {
     const qualityScore = parseFloat(data.qualityScore);
 
     const completionRate = totalTasks > 0 ? (tasksCompleted / totalTasks) * 100 : 0;
-    const productiveTime = hoursWorked - downtime;
+    const productiveTime = Math.max(0, hoursWorked - downtime);
     const productivity = productiveTime > 0 ? tasksCompleted / productiveTime : 0;
     const efficiency = (completionRate * (qualityScore / 100)) || 0;
 
@@ -58,9 +58,15 @@ function WorkPulse() {
       return;
     }
 
+    // Validate downtime doesn't exceed hours worked
+    if (parseFloat(formData.downtime) > parseFloat(formData.hoursWorked)) {
+      alert('Downtime cannot exceed hours worked');
+      return;
+    }
+
     const metrics = calculateMetrics(formData);
     const newWorkstation = {
-      id: Date.now(),
+      id: crypto.randomUUID(),
       ...formData,
       ...metrics
     };
